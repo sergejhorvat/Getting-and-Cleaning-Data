@@ -1,20 +1,21 @@
-### CODE book
+# CODE book
 
 ##Data
 Human Activity Recognition Using Smartphones Dataset
 Version 1.0
-==================================================================
+
+
 Jorge L. Reyes-Ortiz, Davide Anguita, Alessandro Ghio, Luca Oneto.
 Smartlab - Non Linear Complex Systems Laboratory
 DITEN - Universitŕ degli Studi di Genova.
 Via Opera Pia 11A, I-16145, Genoa, Italy.
 activityrecognition@smartlab.ws
 www.smartlab.ws
-==================================================================
 
 
+
+## Raw data contained
 For each record it is provided:
-======================================
 
 - Triaxial acceleration from the accelerometer (total acceleration) and the estimated body acceleration.
 - Triaxial Angular velocity from the gyroscope. 
@@ -22,111 +23,103 @@ For each record it is provided:
 - Its activity label. 
 - An identifier of the subject who carried out the experiment.
 
+##Cleaned data variables
+
+##Variables
+###Subject
+That performed the test (numeric 1:30)
+
+### Activity
+Activity that subject has performed 
+1 WALKING
+2 WALKING_UPSTAIRS
+3 WALKING_DOWNSTAIRS
+4 SITTING
+6 LAYING
+5 STANDING
+
+##Senzor data for every subject and activity
+Mean values of senzor reading for all test done by each subject on each activity
 
 
 
 
+#Commands used in Project
 
-
-
-
-
-
-##
-## You should create one R script called run_analysis.R that does the following. 
-##
-## 1.   Merges the training and the test sets to create one data set.
-## 2.   Extracts only the measurements on the mean and standard deviation for each measurement. 
-## 3.   Uses descriptive activity names to name the activities in the data set
-## 4.   Appropriately labels the data set with descriptive variable names. 
-## 5.   From the data set in step 4, creates a second, 
-##      independent tidy data set with the average of each variable for each activity and each subject.
-
-
+## Set the working directory
 setwd("c://R//gacd//UCI HAR Dataset")
 
-#############
-# TEST DATA #
-#############
-# Load X_test.txt
+
+## Load X_test.txt
 X_test = read.table(file = "test\\X_test.txt" ,header = FALSE)
-# Load y_test.txt
+## Load y_test.txt
 y_test = read.table(file = "test\\y_test.txt" ,header = FALSE)
-# Load subject_test.txt
+## Load subject_test.txt
 subject_test = read.table(file = "test\\subject_test.txt" ,header = FALSE)
 
-# MERGE ALL TEST DATA
+##MERGE ALL TEST DATA
 testall = cbind(subject_test,y_test,X_test)
 
-#################
-# TRAINING DATA #
-#################
-# Load X_train.txt
+
+## Load X_train.txt
 X_train = read.table(file = "train\\X_train.txt" ,header = FALSE)
-# Load y_test.txt
+## Load y_test.txt
 y_train = read.table(file = "train\\y_train.txt" ,header = FALSE)
-# Load subject_test.txt
+## Load subject_test.txt
 subject_train = read.table(file = "train\\subject_train.txt" ,header = FALSE)
 
-# MERGE ALL TRAIN DATA
+## MERGE ALL TRAIN DATA
 trainall = cbind(subject_train,y_train,X_train)
 
-##################################
-# 1. MERGE TRAINING AND DATA SET #
-##################################
+
+## 1. MERGE TRAINING AND DATA SET
 alldata = rbind(trainall,testall)
 
-#Load data features
+##Load data features
 features = read.table("features.txt")
 
-#AllData column names
+##AllData column names
 colnames(alldata) <- c("Subject","Test Labels",as.character(features$V2))
 
-#################################################################################################
-## 2.   Extracts only the measurements on the mean and standard deviation for each measurement. #
-#################################################################################################
-# Subset columns with name that cointain "mean()" and "std()"
 
+## 2.   Extracts only the measurements on the mean and standard deviation for each measurement. #
+
+# Subset columns with name that cointain "mean()" and "std()"
 msdata <- alldata[,grep(c("Subject|Test Labels|mean()|std()"),colnames(alldata))]
 
 
-####*############################################################################################
-## 3.   Uses descriptive activity names to name the activities in the data set                  #
-#################################################################################################
 
-# Load activity_labels.txt
+## 3.   Uses descriptive activity names to name the activities in the data set  
+
+## Load activity_labels.txt
 activity = read.table(file = "activity_labels.txt" ,header = FALSE)
 
-#Set column names to match our data
+##Set column names to match our data
 colnames(activity) <- c("Test Labels", "Activity")
 
-# Merge our data with activity labels
+## Merge our data with activity labels
 msdata_act = merge(msdata,activity,by.x="Test Labels", by.y="Test Labels",sort=TRUE)
 
+
+##Drop Activity label colum
 msdata_act[1] <- NULL
-#Drop Activity label colum
 
 
-################################################################################################
-## 4.   UAppropriately labels the data set with descriptive variable names.                    #
-################################################################################################
-
-#Done in step one
-
-################################################################################################
-##  5.From the data set in step 4, creates a second,                                           #
-##      independent tidy data set with the average of each variable for each                   #
-##           activity and each subject.                                                        #
-################################################################################################
 
 
-#Aggregate data by column Activity and Subject
+## 4.   UAppropriately labels the data set with descriptive variable names.              
+
+##Done in step one
+
+##  5.From the data set in step 4, creates a second, independent tidy data set with the average of each variable for each    activity and each subject. 
+
+##Aggregate data by column Activity and Subject
 msdata_clean <- aggregate(msdata_act, list(Activity=msdata_act$Activity,Subject=msdata_act$Subject),mean)
 
-#Remove subject from source of aggregate
+##Remove subject from source of aggregate
 msdata_clean[,83] <- NULL
 msdata_clean[,2] <- NULL
 
-#Write data for upload
+##Write data for upload
 write.table(msdata_clean,"msdata_clean.txt" , row.name=FALSE)
 
