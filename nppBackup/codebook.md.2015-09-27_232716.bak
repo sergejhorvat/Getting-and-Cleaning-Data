@@ -84,7 +84,7 @@ colnames(alldata) <- c("Subject","Test Labels",as.character(features$V2))
 
 ## 2.   Extracts only the measurements on the mean and standard deviation for each measurement. #
 
-## Subset columns with name that cointain "mean()" and "std()"
+# Subset columns with name that cointain "mean()" and "std()"
 msdata <- alldata[,grep(c("Subject|Test Labels|mean()|std()"),colnames(alldata))]
 
 
@@ -103,6 +103,8 @@ msdata_act = merge(msdata,activity,by.x="Test Labels", by.y="Test Labels",sort=T
 
 ##Drop Activity label colum
 msdata_act[1] <- NULL
+
+
 
 
 ## 4.   UAppropriately labels the data set with descriptive variable names.              
